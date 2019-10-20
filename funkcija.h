@@ -1,6 +1,7 @@
 #include <list> 
 #include<iostream>
 #include<string>
+#include<math.h>
 using namespace std;
 
 class Polinom 
@@ -37,3 +38,9 @@ double Calc(list<Polinom>, double);
 list<Polinom> ToPoly(string);
 string deleteBlanks(string);
 void ispisPoly(list<Polinom>);
+list<Polinom> izvod(list<Polinom> fja);
+bool imaResenja(list<Polinom> fja, double a, double b);
+
+double polovljenje(list<Polinom> fja, double a, double b, double eps);
+int getN(double a, double b, double eps);
+bool Njutn(list<Polinom> fja, double a, double b, double& res, double eps);
