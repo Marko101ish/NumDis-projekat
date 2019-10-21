@@ -2,7 +2,7 @@
 
 void main()
 {
-	double a, b, eps, res;
+	double a, b, eps, res=0;
 	int n;
 	double k, e;
 	list<Polinom> polyList;
@@ -13,6 +13,7 @@ void main()
 
 	polyList = ToPoly(deleteBlanks(ulaz));
 	ispisPoly(polyList);
+	cout << endl;
 
 
 
@@ -29,20 +30,26 @@ void main()
 	{
 		if (imaResenja(polyList, a, b))
 		{
-			//cout << "Resenje metodom polovljenja: " << polovljenje(polyList, a, b, eps) << "    +- " << eps << endl;
+			cout << "Resenje metodom polovljenja: " << polovljenje(polyList, a, b, eps) << "    +- " << eps << endl;
+			if (Secica(polyList, a, b, res, eps))
+				cout << "Resenje metodom secice: " << res << " +- " << eps << endl;
+			else
+				cout << "Ne moze se resiti metodom secice!" << endl;
 			if (Njutn(polyList, a, b, res, eps))
-				cout << res << endl;
+				cout <<"Resenje Njutnovom metodom: "<<res<<" +- "<<eps << endl;
 			else
 				cout << "Ne moze se resiti Njutnovom metodom!" << endl;
 
-
+			if (NjutnMod(polyList, a, b, res, eps))
+				cout <<"Resenje modifikovanovom Njutnovom metodom: "<< res<<" +- "<<eps << endl;
+			else
+				cout << "Ne moze se resiti Njutnovom modifikovanom metodom!" << endl;
 		}
 		else
 		{
 			cout << "Nema resenja!" << endl;
 		}
 	}
-
 
 	system("pause");
 }

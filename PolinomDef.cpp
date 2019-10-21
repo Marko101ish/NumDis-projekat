@@ -128,7 +128,7 @@ void ispisPoly(list<Polinom> polyList)
 		advance(it,1);
 		}
 		while(it!=polyList.end());
-		cout<<ispis<<endl;
+		cout<<ispis;
 	}
 	else
 		cout<<"Prazna lista!"<<endl;
@@ -144,7 +144,8 @@ list<Polinom> izvod(list<Polinom> fja)
 		if (pom.GetExp() == 0)
 			continue;
 		double expNew = pom.GetExp() - 1;
-		pom.SetKoef(pom.GetKoef()*pom.GetExp());	pom.SetExp(expNew);
+		pom.SetKoef(pom.GetKoef()*pom.GetExp());
+		pom.SetExp(expNew);
 		fjaNew.push_back(pom);
 	}
 	return fjaNew;
@@ -165,7 +166,7 @@ double polovljenje(list<Polinom> fja, double a, double b, double eps)
 		
 	int br = 0;
 	double x = (a + b) / 2;
-	while (br++ < n)
+	while (br++ <= n)
 	{
 		x = (a + b) / 2;
 		if (!Calc(fja, x))
@@ -221,4 +222,176 @@ bool Njutn(list<Polinom> fja, double a, double b, double& res, double eps)
 	} while (razlika>krit);
 	res = x1;
 	return true;
+}
+
+bool NjutnMod(list<Polinom> fja, double a, double b, double& res, double eps)
+{
+	list<Polinom> fja1 = izvod(fja);
+	list<Polinom> fja2 = izvod(fja1);
+	double x0, m1, m2, x1, krit, n, f1aABS, f1bABS, razlika;
+	if (Calc(fja, a) * Calc(fja2, a) > 0)
+		x0 = a;
+	else if (Calc(fja, b) * Calc(fja2, b) > 0)
+		x0 = b;
+	else return false;
+	f1aABS = abs(Calc(fja1, a));
+	f1bABS = abs(Calc(fja1, b));
+	if (fja.size() == 1)
+	{
+		cout << "Prvi izvod nije razlicit od 0 za svako x iz intervala!" << endl;
+		return false;
+	}
+	if (imaResenja(fja1, a, b))
+	{
+		cout << "Prvi izvod nije razlicit od 0 za svako x iz intervala!" << endl;
+		return false;
+	}
+
+	m1 = fmin(f1bABS, f1aABS);
+	m2 = fmax(abs(Calc(fja2, a)), abs(Calc(fja2, b)));
+	krit = sqrt((2 * m1 * eps / m2));
+	double poc = Calc(fja1,x0);
+	do
+	{
+		x1 = x0 - (Calc(fja, x0) / poc);
+		razlika = abs(x1 - x0);
+		x0 = x1;
+	} while (razlika > krit);
+	res = x1;
+	return true;
+}
+
+
+bool Secica(list<Polinom> fja, double a, double b, double& res, double eps)
+{
+	list<Polinom> fja1 = izvod(fja);
+	list<Polinom> fja2 = izvod(fja1);
+	double x0, x1, m1, m2, krit, xn, xn1, f1aABS, f1bABS, razlika;
+	if (Calc(fja, a) * Calc(fja2, a) > 0)
+		x0 = a;
+	else if (Calc(fja, b) * Calc(fja2, b) > 0)
+		x0 = b;
+	else return false;
+
+	if (imaResenja(fja1, a, b) == 1 || imaResenja(fja2, a, b) == 1)
+		return false;
+
+	if (Calc(fja, x0)*Calc(fja, a) < 0)
+		x1 = a;
+	else if (Calc(fja, x0)*Calc(fja, b) < 0)
+		x1 = b;
+	else return false;
+	f1aABS = abs(Calc(fja1, a));
+	f1bABS = abs(Calc(fja1, b));
+	if (f1aABS < f1bABS)
+	{
+		m1 = f1aABS;
+		m2 = f1bABS;
+	}
+	else
+	{
+		m1 = f1bABS;
+		m2 = f1aABS;
+	}
+	krit = m1 * eps / (m2 - m1);
+	do
+	{
+		xn1 = x1 - Calc(fja, x1)*(x1 - x0) / (Calc(fja, x1) - Calc(fja, x0));
+		razlika = abs(x1 - x0);
+		x0 = x1;
+		x1 = xn1;
+	} while (razlika > krit);
+
+	res = x1;
+	return true;
+}
+int GetDecNum(double num)
+{
+	int count = 0;
+	num = abs(num);
+	num = num - int(num);
+	while (num < 0.998 && num >0.0000000001)
+	{
+		num = num * 10;
+		count = count + 1;
+		num = abs(num - int(num));
+	}
+	return count;
+}
+
+
+bool Prosta(list<Polinom> fja, double a, double b, double& res, double eps)
+{
+	list<Polinom>gja=fja;
+	Polinom x;
+	list<Polinom>::iterator it = gja.end();
+	list<Polinom>::iterator pomit;
+	double stepen, koef;
+	int n=0, br=0;
+	do
+	{
+		it--;
+		x = *it;
+		stepen = x.GetExp();
+		koef = x.GetKoef();
+		if (stepen != 0)
+		{
+			if (it != gja.end())
+			{
+				pomit = it;
+				it++;
+			}
+			gja.erase(pomit);
+			ispisPoly(gja);
+			cout << endl;
+			for (pomit = gja.begin(); pomit != gja.end(); pomit++)
+			{
+				pomit->SetKoef(pomit->GetKoef() / (-koef));
+			}
+			ispisPoly(gja);
+			cout << "=x"<<endl;
+
+			double k = maxIzvod(gja, a, b, eps, 1/stepen);
+			double x0 = a, x1;
+			if (k > 1)
+			{
+
+				//IZMENI!!!
+
+
+				return false;
+			}
+			else
+			{
+				while (abs(pow(Calc(gja, x0), 1 / stepen) - x0)*pow(k, n) / (1 - k) > eps)
+				{
+					n++;
+				}
+				for (int i = 0; i < n; i++)
+				{
+					x1 = Calc(gja, x0);
+					x0 = x1;
+				}
+				res = x1;
+				break;
+			}
+			
+		}
+	} while (it != gja.begin());
+	return true;
+}
+
+double maxIzvod(list<Polinom> gja, double a, double b, double eps, double stepen)
+{
+	double max = 0;
+	double x0 = a;
+	while (x0 < b)
+	{
+		double pom = abs(pow(Calc(gja, x0 + eps), stepen) - pow(Calc(gja, x0),stepen) / eps);
+		if (pom > 1)
+			return 2;
+		else if (pom > max)
+			max = pom;
+	}
+	return max;
 }
