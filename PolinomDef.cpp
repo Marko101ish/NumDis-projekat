@@ -332,29 +332,29 @@ int GetDecNum(double num)
 
 //OPERATORI
 
-//bool operator < (Polinom const& p1, Polinom const& p2)
-//{
-//	if (p1.GetExp() < p2.GetExp())
-//		return true;
-//	else
-//		return false;
-//}
-//
-//bool operator > (Polinom const& p1, Polinom const& p2)
-//{
-//	if (p1.GetExp() > p2.GetExp())
-//		return true;
-//	else
-//		return false;
-//}
-//
-//bool operator == (Polinom const& p1, Polinom const& p2)
-//{
-//	if ((p1.GetExp() == p2.GetExp()) && (p1.GetKoef() == p2.GetKoef()))
-//		return true;
-//	else
-//		return false;
-//}
+bool operator < (Polinom const& p1, Polinom const& p2)
+{
+	if (p1.GetExp() < p2.GetExp())
+		return true;
+	else
+		return false;
+}
+
+bool operator > (Polinom const& p1, Polinom const& p2)
+{
+	if (p1.GetExp() > p2.GetExp())
+		return true;
+	else
+		return false;
+}
+
+bool operator == (Polinom const& p1, Polinom const& p2)
+{
+	if ((p1.GetExp() == p2.GetExp()) && (p1.GetKoef() == p2.GetKoef()))
+		return true;
+	else
+		return false;
+}
 
 
 bool Prosta(list<Polinom> fja, double a, double b, double& res, double eps)

@@ -15,6 +15,8 @@ void main()
 //----------------------------
 
 	polyList = ToPoly(deleteBlanks(ulaz));
+	polyList.sort();
+	polyList.reverse();
 
 	cout << "Unesite interval:" << endl;
 	cin >> a >> b;

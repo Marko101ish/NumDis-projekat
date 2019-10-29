@@ -25,9 +25,9 @@ public:
 	// Promenio u const, zbog sortiranja kasnije
 	//OPERATORI
 
-	//friend bool operator < (Polinom const& p1, Polinom const& p2)
-	//friend bool operator > (Polinom const& p1, Polinom const& p2)
-	//friend bool operator == (Polinom const& p1, Polinom const& p2)
+	friend bool operator < (Polinom const& p1, Polinom const& p2);
+	friend bool operator > (Polinom const& p1, Polinom const& p2);
+	friend bool operator == (Polinom const& p1, Polinom const& p2);
 
 	double GetKoef() const
 	{
