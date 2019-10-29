@@ -37,37 +37,48 @@ list<Polinom> ToPoly(string ulaz)
 	list<Polinom> polyList;
 	if(po>-1)
 	{
-		while (po > -1)
+		
+		try
 		{
-			po = ulaz.find('x');
-			if (po > -1)
+			while (po > -1)
 			{
-				if (po == 0)
+				po = ulaz.find('x');
+				if (po > -1)
 				{
-					k = 1;
+					if ((po == 0) || ( (po==1) && (ulaz[0]='+') ))
+					{
+						k = 1;
+					}
+					else if (po == 1 && ulaz[0] == '-')
+						k = -1;
+					else
+						k = stod(ulaz);
 				}
 				else
-					k = stod(ulaz);
-			}
-			else
-			{
-				polyList.push_back(Polinom(stod(ulaz),0));
-				break;
-			}
-			ulaz=ulaz.substr(po+1);
-			e=stod(ulaz);
+				{
+					polyList.push_back(Polinom(stod(ulaz), 0));
+					break;
+				}
+				ulaz = ulaz.substr(po + 1);
+				e = stod(ulaz);
 
-			Polinom pom(k,e);
-			polyList.push_back(pom);
+				Polinom pom(k, e);
+				polyList.push_back(pom);
 
-			if(ulaz[0]=='+' || ulaz[0]=='-')
-				ulaz=ulaz.substr(1);
-			po=fmin(ulaz.find('-'), ulaz.find('+'));
-			if(po>-1)
-			{
-				ulaz=ulaz.substr(po);
+				if (ulaz[0] == '+' || ulaz[0] == '-')
+					ulaz = ulaz.substr(1);
+				po = fmin(ulaz.find('-'), ulaz.find('+'));
+				if (po > -1)
+				{
+					ulaz = ulaz.substr(po);
+				}
+
 			}
-		
+		}
+		catch(exception)
+		{
+			cout << "Neodgovarajuc unos!" << endl;
+			exit(0);
 		}
 	}
 	else
@@ -319,6 +330,32 @@ int GetDecNum(double num)
 	return count;
 }
 
+//OPERATORI
+
+//bool operator < (Polinom const& p1, Polinom const& p2)
+//{
+//	if (p1.GetExp() < p2.GetExp())
+//		return true;
+//	else
+//		return false;
+//}
+//
+//bool operator > (Polinom const& p1, Polinom const& p2)
+//{
+//	if (p1.GetExp() > p2.GetExp())
+//		return true;
+//	else
+//		return false;
+//}
+//
+//bool operator == (Polinom const& p1, Polinom const& p2)
+//{
+//	if ((p1.GetExp() == p2.GetExp()) && (p1.GetKoef() == p2.GetKoef()))
+//		return true;
+//	else
+//		return false;
+//}
+
 
 bool Prosta(list<Polinom> fja, double a, double b, double& res, double eps)
 {
@@ -327,9 +364,12 @@ bool Prosta(list<Polinom> fja, double a, double b, double& res, double eps)
 	list<Polinom>::iterator it = gja.end();
 	list<Polinom>::iterator pomit;
 	double stepen, koef;
+	bool flag = false;
 	int n=0, br=0;
+	cout<<GetDecNum(eps);
 	do
 	{
+		gja = fja;
 		it--;
 		x = *it;
 		stepen = x.GetExp();
@@ -342,43 +382,37 @@ bool Prosta(list<Polinom> fja, double a, double b, double& res, double eps)
 				it++;
 			}
 			gja.erase(pomit);
-			ispisPoly(gja);
-			cout << endl;
+	//		ispisPoly(gja);
+	//		cout << endl;
 			for (pomit = gja.begin(); pomit != gja.end(); pomit++)
 			{
 				pomit->SetKoef(pomit->GetKoef() / (-koef));
 			}
-			ispisPoly(gja);
-			cout << "=x"<<endl;
+	//		ispisPoly(gja);
+	//		cout << "=x"<<endl<<endl;
 
-			double k = maxIzvod(gja, a, b, eps, 1/stepen);
 			double x0 = a, x1;
-			if (k > 1)
+			double razlika1, razlika0;
+			x1 = pow(Calc(gja, x0),1/stepen);
+			razlika1 = abs(x1 - x0);
+			for (int i = 0; i < 10; i++)
 			{
+				razlika0 = razlika1;
 
-				//IZMENI!!!
-
-
-				return false;
+				x0 = x1;
+				x1 = pow(Calc(gja, x0), 1 / stepen);
+				
+				razlika1 = abs(x1 - x0);
+				if (razlika0 <= razlika1)
+					break;
 			}
-			else
+			if (razlika1 < razlika0)
 			{
-				while (abs(pow(Calc(gja, x0), 1 / stepen) - x0)*pow(k, n) / (1 - k) > eps)
-				{
-					n++;
-				}
-				for (int i = 0; i < n; i++)
-				{
-					x1 = Calc(gja, x0);
-					x0 = x1;
-				}
-				res = x1;
-				break;
+				flag = true; res = x1;
 			}
-			
 		}
 	} while (it != gja.begin());
-	return true;
+	return flag;
 }
 
 double maxIzvod(list<Polinom> gja, double a, double b, double eps, double stepen)
