@@ -64,7 +64,7 @@ bool Secica(list<Polinom> fja, double a, double b, double& res, double eps);
 bool Prosta(list<Polinom> fja, double a, double b, double& res, double eps);
 int GetDecNum(double eps);
 double maxIzvod(list<Polinom> gja, double a, double b, double eps, double stepen);
-bool NjutnMod(list<Polinom> fja, double a, double b, double& res, double eps);
+bool NjutnMod(list<Polinom> fja, double a, double b, double& res, double eps, double resT);
 
 
 

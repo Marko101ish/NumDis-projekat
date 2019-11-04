@@ -187,6 +187,7 @@ double polovljenje(list<Polinom> fja, double a, double b, double eps)
 		else
 			a = x;
 	}
+
 	return x;
 	
 }
@@ -235,7 +236,7 @@ bool Njutn(list<Polinom> fja, double a, double b, double& res, double eps)
 	return true;
 }
 
-bool NjutnMod(list<Polinom> fja, double a, double b, double& res, double eps)
+bool NjutnMod(list<Polinom> fja, double a, double b, double& res, double eps, double resT)
 {
 	list<Polinom> fja1 = izvod(fja);
 	list<Polinom> fja2 = izvod(fja1);
@@ -262,12 +263,23 @@ bool NjutnMod(list<Polinom> fja, double a, double b, double& res, double eps)
 	m2 = fmax(abs(Calc(fja2, a)), abs(Calc(fja2, b)));
 	krit = sqrt((2 * m1 * eps / m2));
 	double poc = Calc(fja1,x0);
+	int i = 0;
 	do
 	{
 		x1 = x0 - (Calc(fja, x0) / poc);
 		razlika = abs(x1 - x0);
 		x0 = x1;
-	} while (razlika > krit);
+		i++;
+	} while (razlika>krit);
+
+	if (abs(x1 - resT) > eps)
+	{
+		cout << "Modifikovanom Njutnovom metodom sporo konvergira!" << endl;
+		cout << "Trenutno: " << x1 << endl;
+		return false;
+	}
+
+
 	res = x1;
 	return true;
 }
@@ -277,21 +289,32 @@ bool Secica(list<Polinom> fja, double a, double b, double& res, double eps)
 {
 	list<Polinom> fja1 = izvod(fja);
 	list<Polinom> fja2 = izvod(fja1);
-	double x0, x1, m1, m2, krit, xn, xn1, f1aABS, f1bABS, razlika;
+	double x0, x1, m1, m2, krit, xn1, f1aABS, f1bABS, razlika;
 	if (Calc(fja, a) * Calc(fja2, a) > 0)
 		x0 = a;
 	else if (Calc(fja, b) * Calc(fja2, b) > 0)
 		x0 = b;
-	else return false;
+	else
+	{
+		//cout << "Proizvod f(x) i f''(x) nije veci od 0 za x=a ili x=b!" << endl;
+		return false;
+	}
 
 	if (imaResenja(fja1, a, b) == 1 || imaResenja(fja2, a, b) == 1)
+	{
+		//cout << "Prvi ili drugi izvod su jednaki nuli na datom intervalu!" << endl;
 		return false;
+	}
 
 	if (Calc(fja, x0)*Calc(fja, a) < 0)
 		x1 = a;
 	else if (Calc(fja, x0)*Calc(fja, b) < 0)
 		x1 = b;
-	else return false;
+	else
+	{
+		cout << "Proizvod f(x0) i f(x) nije manji od 0 za x=a ili x=b!" << endl;
+		return false;
+	}
 	f1aABS = abs(Calc(fja1, a));
 	f1bABS = abs(Calc(fja1, b));
 	if (f1aABS < f1bABS)
@@ -316,6 +339,7 @@ bool Secica(list<Polinom> fja, double a, double b, double& res, double eps)
 	res = x1;
 	return true;
 }
+
 int GetDecNum(double num)
 {
 	int count = 0;
@@ -330,7 +354,7 @@ int GetDecNum(double num)
 	return count;
 }
 
-//OPERATORI
+		#pragma region OPERATORI
 
 bool operator < (Polinom const& p1, Polinom const& p2)
 {
@@ -355,7 +379,7 @@ bool operator == (Polinom const& p1, Polinom const& p2)
 	else
 		return false;
 }
-
+#pragma endregion
 
 bool Prosta(list<Polinom> fja, double a, double b, double& res, double eps)
 {
@@ -366,7 +390,6 @@ bool Prosta(list<Polinom> fja, double a, double b, double& res, double eps)
 	double stepen, koef;
 	bool flag = false;
 	int n=0, br=0;
-	cout<<GetDecNum(eps);
 	do
 	{
 		gja = fja;
@@ -382,14 +405,10 @@ bool Prosta(list<Polinom> fja, double a, double b, double& res, double eps)
 				it++;
 			}
 			gja.erase(pomit);
-	//		ispisPoly(gja);
-	//		cout << endl;
 			for (pomit = gja.begin(); pomit != gja.end(); pomit++)
 			{
 				pomit->SetKoef(pomit->GetKoef() / (-koef));
 			}
-	//		ispisPoly(gja);
-	//		cout << "=x"<<endl<<endl;
 
 			double x0 = a, x1;
 			double razlika1, razlika0;
